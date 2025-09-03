@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process name="SampleProcess"
+         targetNamespace="http://example.com/sample"
+         xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:tns="http://example.com/sample"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+         xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+         xmlns:bpws="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         suppressJoinFailure="yes"
+         exitOnStandardFault="no">
+
+    <partnerLinks>
+        <partnerLink name="client" partnerLinkType="tns:SamplePLT" myRole="SampleProvider"/>
+        <partnerLink name="service" partnerLinkType="tns:ServicePLT" partnerRole="ServiceProvider"/>
+    </partnerLinks>
+
+    <variables>
+        <variable name="input" messageType="tns:SampleRequest"/>
+        <variable name="output" messageType="tns:SampleResponse"/>
+        <variable name="tempVar" type="xsd:string"/>
+    </variables>
+
+    <sequence name="MainSequence">
+        <receive partnerLink="client" operation="startProcess" portType="tns:SamplePT" variable="input" createInstance="yes"/>
+        <assign name="AssignTempVar">
+            <copy>
+                <from variable="input" part="payload"/>
+                <to variable="tempVar"/>
+            </copy>
+        </assign>
+        <invoke partnerLink="service" operation="processData" portType="tns:ServicePT" inputVariable="input" outputVariable="output"/>
+        <reply partnerLink="client" operation="startProcess" portType="tns:SamplePT" variable="output"/>
+    </sequence>
+
+</process>
